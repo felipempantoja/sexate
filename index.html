@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>Sexate :: Escolha os PDFs para enviar o email</title>
+
+  <style>
+    #drag-file {
+      background-color: blue;
+      color: white;
+      text-align: center;
+      width: 300px;
+      height: 300px;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>Bem vindo ao disparador de emails Sexate!</h1>
+
+  <!-- <input type="button" id="btn-create-file" value="Criar arquivo"> -->
+  <!-- <form action="/file-upload" class="dropzone" id="my-awesome-dropzone">
+      <input type="file" name="file" />
+    </form> -->
+
+  <input type="button" id="btn-upload-file" value="Selecionar arquivo">
+
+  <div id="drag-file">
+      <p>Arraste os PDFs para cá</p>
+  </div>
+
+  <div id="chosen-files"></div>
+  <input type="button" id="btn-confirm-upload" value="Confirmar envio" style="display: none" />
+
+</body>
+
+<script>
+  require('./index')
+</script>
+
+</html>
