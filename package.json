@@ -5,7 +5,12 @@
   "description": "Electron App to one-click send emails with attachments",
   "author": "Felipe Pantoja <felipempantoja@gmail.com>",
   "build": {
-    "appId": "sexate"
+    "appId": "sexate",
+    "win": {
+      "target": [
+        "zip"
+      ]
+    }
   },
   "main": "public/electron.js",
   "homepage": "./",
@@ -13,6 +18,7 @@
     "bootstrap": "^4.3.1",
     "electron-is-dev": "^1.0.1",
     "nodemailer": "^6.1.0",
+    "nodemailer-sendgrid-transport": "^0.2.0",
     "react": "^16.8.6",
     "react-bootstrap": "^1.0.0-beta.6",
     "react-dom": "^16.8.6"
@@ -23,7 +29,7 @@
     "react-test": "react-scripts test --env=jsdom",
     "react-eject": "react-scripts eject",
     "electron-build": "electron-builder",
-    "release": "yarn react-build && electron-builder --publish=always",
+    "release": "yarn react-build && electron-builder --dir --win",
     "build": "yarn react-build && yarn electron-build",
     "start": "concurrently \"./node_modules/.bin/cross-env BROWSER=none yarn react-start\" \"wait-on http://localhost:3000 && electron .\""
   },
@@ -41,7 +47,6 @@
     "cross-env": "^5.2.0",
     "electron": "^4.1.4",
     "electron-builder": "^20.39.0",
-    "nodemailer-sendgrid-transport": "^0.2.0",
     "react-scripts": "2.1.8",
     "wait-on": "^3.2.0"
   }

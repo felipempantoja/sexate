@@ -14,6 +14,16 @@ function createWindow() {
   const settingsPath = `${homedir}/sexate-mail-settings.json`
   try {
     mailSettings = require(settingsPath)
+
+    mainWindow = new BrowserWindow({ width: 800, height: 600, resizable: false })
+    mainWindow.setMenuBarVisibility(false)
+    mainWindow.loadURL(
+      isDev
+        ? "http://localhost:3000"
+        : `file://${path.join(__dirname, "../build/index.html")}`
+    )
+    mainWindow.on("closed", _ => mainWindow = null)
+
   } catch (err) {
     const options = {
       type: 'error',
@@ -26,17 +36,8 @@ function createWindow() {
     dialog.showMessageBox(null, options, _ => app.quit())
   }
 
-  mainWindow = new BrowserWindow({ width: 800, height: 600, resizable: false })
-  mainWindow.setMenuBarVisibility(false)
-  mainWindow.loadURL(
-    isDev
-      ? "http://localhost:3000"
-      : `file://${path.join(__dirname, "../build/index.html")}`
-  )
-  mainWindow.on("closed", _ => mainWindow = null)
-
   // Open the DevTools.
-  mainWindow.webContents.openDevTools()
+  // mainWindow.webContents.openDevTools()
 }
 
 app.on("ready", createWindow)
@@ -82,7 +83,7 @@ ipcMain.on('sendmail', (event, recipients) => {
   const transporter = nodemailer.createTransport(
     sendgridTransport({
       auth: {
-        api_key: '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'
+        api_key: mailSettings.apiKey
       },
     })
   )
@@ -103,6 +104,7 @@ ipcMain.on('sendmail', (event, recipients) => {
         console.error(error)
         mainWindow.webContents.send('error-sending-emails', error)
       } else {
+        console.log('success')
         mainWindow.webContents.send('emails-sent', error)
       }
     })
