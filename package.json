@@ -1,14 +1,16 @@
 {
-  "name": "sexate-react",
-  "version": "0.1.0",
+  "name": "sexate",
+  "version": "1.0.0-SNAPSHOT",
   "private": true,
-  "description": "Electron App to one-click send emails with attachments",
+  "description": "Envio rápido de emails com anexos",
   "author": "Felipe Pantoja <felipempantoja@gmail.com>",
   "build": {
     "appId": "sexate",
+    "productName": "Sexate - Envio de Emails",
+    "copyright": "Copyright © 2019 ${author}",
     "win": {
       "target": [
-        "zip"
+        "portable"
       ]
     }
   },
@@ -17,6 +19,7 @@
   "dependencies": {
     "bootstrap": "^4.3.1",
     "electron-is-dev": "^1.0.1",
+    "electron-log": "^3.0.5",
     "nodemailer": "^6.1.0",
     "nodemailer-sendgrid-transport": "^0.2.0",
     "react": "^16.8.6",
@@ -29,8 +32,10 @@
     "react-test": "react-scripts test --env=jsdom",
     "react-eject": "react-scripts eject",
     "electron-build": "electron-builder",
-    "release": "yarn react-build && electron-builder --dir --win",
+    "release:linux": "yarn react-build && electron-builder --linux",
+    "release:win": "yarn react-build && electron-builder --win --x64 --ia32",
     "build": "yarn react-build && yarn electron-build",
+    "postinstall": "electron-builder install-app-deps",
     "start": "concurrently \"./node_modules/.bin/cross-env BROWSER=none yarn react-start\" \"wait-on http://localhost:3000 && electron .\""
   },
   "eslintConfig": {

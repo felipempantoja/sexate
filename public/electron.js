@@ -1,33 +1,44 @@
 const electron = require("electron")
 const { app, BrowserWindow, ipcMain, dialog } = electron
+const log = require('electron-log')
 const path = require("path")
 const isDev = require("electron-is-dev")
 const nodemailer = require('nodemailer')
 const sendgridTransport = require('nodemailer-sendgrid-transport')
 
-let mainWindow
+// Log Configs
+// log.transports.console.level = isDev
+// log.transports.file.level = !isDev
 
+let mainWindow
 let mailSettings
 
 function createWindow() {
+  log.info('-----------------------------------------------------')
+  log.info('Preparing to initialize Sexate...')
   const homedir = require('os').homedir()
-  const settingsPath = `${homedir}/sexate-mail-settings.json`
+  const settingsPath = path.join(homedir, 'sexate-mail-settings.json')
   try {
+    log.info(`Checking the existence of the settings file: ${settingsPath}`)
     mailSettings = require(settingsPath)
 
+    log.info('Creating a BrowserWindow instance...')
     mainWindow = new BrowserWindow({ width: 800, height: 600, resizable: false })
     mainWindow.setMenuBarVisibility(false)
     mainWindow.loadURL(
       isDev
         ? "http://localhost:3000"
         : `file://${path.join(__dirname, "../build/index.html")}`
-        )
-        mainWindow.on("closed", _ => mainWindow = null)
+    )
+    mainWindow.on("closed", _ => mainWindow = null)
 
-        // Open the DevTools.
-        // mainWindow.webContents.openDevTools()
+    // Open the DevTools.
+    if(isDev) {
+      mainWindow.webContents.openDevTools()
+    }
 
   } catch (err) {
+    log.error('Error while starting the app', err)
     const options = {
       type: 'error',
       buttons: ['Fechar'],
@@ -70,8 +81,9 @@ ipcMain.on('choose-files', _ => {
     properties: ['openFile', 'multiSelections']
   }, function (files) {
     if (files !== undefined) {
+      log.info(`Chosen files to send emails: ${files}`)
       mainWindow.webContents.send('chosen-files', files.map(file => ({
-        name: file.substring(file.lastIndexOf("/") + 1, file.length),
+        name: file.substring(file.lastIndexOf(path.sep) + 1, file.length),
         path: file
       })))
     }
@@ -79,6 +91,7 @@ ipcMain.on('choose-files', _ => {
 })
 
 ipcMain.on('sendmail', async (event, recipients) => {
+  log.info('Preparing to send emails...')
   // Configure Nodemailer SendGrid Transporter
   const transporter = nodemailer.createTransport(
     sendgridTransport({
@@ -102,17 +115,20 @@ ipcMain.on('sendmail', async (event, recipients) => {
     }
     // Send Email
     try {
+      log.info(`Sending email to "${recipient.email}" with attachment "${recipient.file.name}"`)
       await transporter.sendMail(mailOptions)
+      log.info(`Email to "${recipient.email}" successfully sent`)
     } catch (err) {
+      log.info(`Error sending email to "${recipient.email}"`, err)
       failedEmails.push(recipient.email)
     }
   }
 
   if (failedEmails.length) {
-    console.log(`Failed sending ${failedEmails.length} emails`)
+    log.info(`Total failed mail sendings: ${failedEmails.length}`)
     mainWindow.webContents.send('error-sending-emails', failedEmails)
   } else {
+    log.info('All emails has been sent')
     mainWindow.webContents.send('emails-sent')
   }
-
 })

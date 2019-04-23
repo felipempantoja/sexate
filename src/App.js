@@ -36,7 +36,7 @@ export default class App extends Component {
         recipients: this.state.recipients.filter(e => failedEmails.indexOf(e.email) >= 0), // keeping only failed
         modal: {
           show: true,
-          title: 'Erro ao enviar emails!',
+          title: 'Erro ao enviar alguns emails!',
           body: (
             <div>O envio de email falhou para os seguintes destinatários:
               <ul>
