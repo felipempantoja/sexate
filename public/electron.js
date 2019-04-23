@@ -1,6 +1,7 @@
 const electron = require("electron")
 const { app, BrowserWindow, ipcMain, dialog } = electron
 const log = require('electron-log')
+const fs = require('fs')
 const path = require("path")
 const isDev = require("electron-is-dev")
 const nodemailer = require('nodemailer')
@@ -20,7 +21,8 @@ function createWindow() {
   const settingsPath = path.join(homedir, 'sexate-mail-settings.json')
   try {
     log.info(`Checking the existence of the settings file: ${settingsPath}`)
-    mailSettings = require(settingsPath)
+    mailSettings = JSON.parse(fs.readFileSync(settingsPath, 'utf-8'))
+    log.info(mailSettings.html)
 
     log.info('Creating a BrowserWindow instance...')
     mainWindow = new BrowserWindow({ width: 800, height: 600, resizable: false })

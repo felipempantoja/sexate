@@ -9,9 +9,13 @@
     "productName": "Sexate - Envio de Emails",
     "copyright": "Copyright © 2019 ${author}",
     "win": {
+      "icon": "./build/icons/32x32.png",
       "target": [
         "portable"
       ]
+    },
+    "linux": {
+      "icon": "./build/icons/32x32.png"
     }
   },
   "main": "public/electron.js",
