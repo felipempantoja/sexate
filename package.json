@@ -1,6 +1,6 @@
 {
   "name": "sexate",
-  "version": "1.0.0-SNAPSHOT",
+  "version": "1.0.0",
   "private": true,
   "description": "Envio rápido de emails com anexos",
   "author": "Felipe Pantoja <felipempantoja@gmail.com>",
