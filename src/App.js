@@ -30,13 +30,21 @@ export default class App extends Component {
   componentDidMount() {
     ipcRenderer.on('chosen-files', (event, files) => this._toRecipients(files))
 
-    ipcRenderer.on('error-sending-emails', _ => {
+    ipcRenderer.on('error-sending-emails', (event, failedEmails) => {
       this.setState({
         sendingEmails: false,
+        recipients: this.state.recipients.filter(e => failedEmails.indexOf(e.email) >= 0), // keeping only failed
         modal: {
           show: true,
           title: 'Erro ao enviar emails!',
-          body: 'Verifique se os emails enviados são emails válidos.'
+          body: (
+            <div>O envio de email falhou para os seguintes destinatários:
+              <ul>
+                {failedEmails.map(e => (<li>{e}</li>))}
+              </ul>
+              Verifique se o endereço de email está correto e tente novamente.
+            </div>
+          )
         }
       })
     })

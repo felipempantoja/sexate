@@ -21,8 +21,11 @@ function createWindow() {
       isDev
         ? "http://localhost:3000"
         : `file://${path.join(__dirname, "../build/index.html")}`
-    )
-    mainWindow.on("closed", _ => mainWindow = null)
+        )
+        mainWindow.on("closed", _ => mainWindow = null)
+
+        // Open the DevTools.
+        // mainWindow.webContents.openDevTools()
 
   } catch (err) {
     const options = {
@@ -35,9 +38,6 @@ function createWindow() {
     }
     dialog.showMessageBox(null, options, _ => app.quit())
   }
-
-  // Open the DevTools.
-  // mainWindow.webContents.openDevTools()
 }
 
 app.on("ready", createWindow)
@@ -78,7 +78,7 @@ ipcMain.on('choose-files', _ => {
   });
 })
 
-ipcMain.on('sendmail', (event, recipients) => {
+ipcMain.on('sendmail', async (event, recipients) => {
   // Configure Nodemailer SendGrid Transporter
   const transporter = nodemailer.createTransport(
     sendgridTransport({
@@ -88,7 +88,9 @@ ipcMain.on('sendmail', (event, recipients) => {
     })
   )
 
-  recipients.forEach(recipient => {
+  let failedEmails = []
+
+  for (let recipient of recipients) {
     let mailOptions = {
       ...mailSettings,
       to: recipient.email,
@@ -99,14 +101,18 @@ ipcMain.on('sendmail', (event, recipients) => {
       }]
     }
     // Send Email
-    transporter.sendMail(mailOptions, (error, info) => {
-      if (error) {
-        console.error(error)
-        mainWindow.webContents.send('error-sending-emails', error)
-      } else {
-        console.log('success')
-        mainWindow.webContents.send('emails-sent', error)
-      }
-    })
-  })
+    try {
+      await transporter.sendMail(mailOptions)
+    } catch (err) {
+      failedEmails.push(recipient.email)
+    }
+  }
+
+  if (failedEmails.length) {
+    console.log(`Failed sending ${failedEmails.length} emails`)
+    mainWindow.webContents.send('error-sending-emails', failedEmails)
+  } else {
+    mainWindow.webContents.send('emails-sent')
+  }
+
 })
